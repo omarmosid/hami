@@ -31,7 +31,7 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const text = await getText(request);
 		const isFlagged = check(text);
-		return new Response('Hello World!');
+		return new Response('Hello World test!');
 	},
 };
 
