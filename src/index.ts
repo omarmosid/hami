@@ -30,15 +30,40 @@ export interface Env {
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const text = await getText(request);
-		const isFlagged = check(text);
-		return new Response('Hello World test!');
+		if (!text) {
+			return new Response(
+				JSON.stringify({
+					isSus: false,
+					comment: 'No text supplied.',
+				}),
+				{
+					headers: {
+						'content-type': 'application/json;charset=UTF-8',
+					},
+				}
+			);
+		}
+		const isSus = check(text);
+		const response = {
+			isSus: isSus,
+			comment: 'This comment has been flagged for being suspicious.',
+		};
+		return new Response(JSON.stringify(response), {
+			headers: {
+				'content-type': 'application/json;charset=UTF-8',
+			},
+		});
 	},
 };
 
 async function getText(request: Request) {
+	console.log('cf', request.cf);
 	const contentType = request.headers.get('content-type') || '';
 	if (contentType.includes('application/json')) {
-		return JSON.stringify(await request.json());
+		const jsonText: any = await request.json();
+		const text = jsonText['text'] || '';
+		console.log('text', text);
+		return text;
 	} else {
 		return '';
 	}
